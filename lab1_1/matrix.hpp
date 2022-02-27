@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <iostream>
+#include <iomanip>
+#include <cmath>
 
 template <class T>
 using Vector = std::vector<T>;
@@ -87,10 +89,7 @@ public:
 				L[i][k] = U[i][k] / U[k][k];
 
 				for (size_t j = 0; j < _size; ++j) {
-					U[i][j] = U[i][j] - L[i][k] * U[k][j];
-					if (U[i][j] < 1e-6) {
-						U[i][j] = 0;
-					}
+					U[i][j] -= L[i][k] * U[k][j];
 				}
 			}
 		}
@@ -112,7 +111,7 @@ template <class T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
 	for (size_t i = 0; i < matrix.Size(); ++i) {
 		for (size_t j = 0; j < matrix.Size(); ++j) {
-			os << matrix[i][j] << ' ';
+			os << std::setw(8) << matrix[i][j] << ' ';
 		}
 		os << '\n';
 	}
@@ -162,7 +161,7 @@ Vector<T> operator*(const Matrix<T>& a, const Vector<T>& b) {
 template <class T>
 std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
 	for (size_t i = 0; i < vec.size(); ++i) {
-		os << vec[i] << ' ';
+		os << std::setw(8) << vec[i] << ' ';
 	}
 	return os;
 }

@@ -24,6 +24,9 @@ struct LUP {
 		for (size_t i = 0; i < U.Size(); ++i) {
 			res *= U[i][i];
 		}
+		if (P.size() & 1) {
+			res = -res;
+		}
 		return res;
 	}
 
