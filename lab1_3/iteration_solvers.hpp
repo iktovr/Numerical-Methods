@@ -50,7 +50,15 @@ size_t SeidelMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& M, 
 	Vector<T> beta = -(M * b);
 	x = beta;
 
+	Matrix<T> alpha2 = alpha;
+	for (size_t i = 0; i < alpha2.Size(); ++i) {
+		for (size_t j = 0; j < i; ++j) {
+			alpha2[i][j] = 0;
+		}
+	}
+
 	T alpha_norm = alpha.Norm();
+	T alpha2_norm = alpha2.Norm();
 	size_t count = 0;
 	double eps_k;
 	Vector<T> next_x(x.size());
@@ -67,7 +75,7 @@ size_t SeidelMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& M, 
 		}
 
 		if (alpha_norm < 1) {
-			eps_k = alpha_norm / (1.0 - alpha_norm) * Norm(next_x - x);
+			eps_k = alpha2_norm / (1.0 - alpha_norm) * Norm(next_x - x);
 		} else {
 			eps_k = Norm(next_x - x);
 		}
