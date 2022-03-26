@@ -76,11 +76,11 @@ size_t QR_Eigenvalues(Matrix<T> A, double eps, std::vector<std::complex<T>>& eig
 			}
 			eps_2[j] = std::sqrt(eps_2[j]);
 
-			eps_3[j] = std::abs(prev_eigenvalues[j] - eigenvalues[j]);
+			eps_3[j] = std::abs(prev_eigenvalues[j]) - std::abs(eigenvalues[j]);
 		}
 
 		++iter_count;
-	} while ((Norm(eps_1, 2) > eps && Norm(eps_2, 2) > eps) || Norm(eps_3, 2) > eps);
+	} while ((Norm(eps_1, 2) > eps && Norm(eps_2, 2) > eps) || Norm(eps_3) > eps);
 
 	return iter_count;
 }
