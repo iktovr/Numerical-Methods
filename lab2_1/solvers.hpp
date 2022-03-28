@@ -18,7 +18,7 @@ int sign(T x) {
 template <class T>
 std::pair<T, size_t> IterationMethod(T x, const interval_t<T>& interval, const std::function<T(T)>& f, const std::function<T(T)>& df, double eps) {
 	T lambda = sign(df(x)) / std::max(std::abs(df(interval.first)), std::abs(df(interval.second)));
-	double q = std::min(std::abs(1 - lambda * df(interval.first)), std::abs(1 - lambda * df(interval.second)));
+	double q = std::max(std::abs(1 - lambda * df(interval.first)), std::abs(1 - lambda * df(interval.second)));
 	q = q / (1 - q);
 
 	double eps_k;
