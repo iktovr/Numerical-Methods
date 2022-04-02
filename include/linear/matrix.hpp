@@ -241,7 +241,7 @@ Matrix<T> operator-(const Matrix<T>& a, const Matrix<T>& b) {
 
 template <class T>
 Vector<T> operator*(const Matrix<T>& a, const Vector<T>& b) {
-	if (a.Size() != b.size()) {
+	if (a.Size() != b.Size()) {
 		throw "Dimension mismatch";
 	}
 	Vector<T> res(a.Size());

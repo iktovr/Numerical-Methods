@@ -81,7 +81,7 @@ size_t QR_Eigenvalues(Matrix<T> A, double eps, std::vector<std::complex<T>>& eig
 		}
 
 		++iter_count;
-	} while ((Norm(eps_1, 2) > eps && Norm(eps_2, 2) > eps) || Norm(eps_3) > eps);
+	} while ((eps_1.Norm(2) > eps && eps_2.Norm(2) > eps) || eps_3.Norm() > eps);
 
 	return iter_count;
 }

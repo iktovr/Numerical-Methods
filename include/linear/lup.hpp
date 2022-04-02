@@ -32,7 +32,7 @@ struct LUP {
 	}
 
 	Vector<T> Solve(Vector<T> b) {
-		if (b.size() != L.Size()) {
+		if (b.Size() != L.Size()) {
 			throw "Dimension mismatch";
 		}
 		for (const std::pair<size_t, size_t>& p: P) {
@@ -40,16 +40,16 @@ struct LUP {
 		}
 
 		Vector<T> x(L.Size()), z(L.Size());
-		for (size_t i = 0; i < b.size(); ++i) {
+		for (size_t i = 0; i < b.Size(); ++i) {
 			z[i] = b[i];
 			for (size_t j = 0; j < i; ++j) {
 				z[i] -= L[i][j] * z[j];
 			}
 		}
 
-		for (int i = b.size()-1; i >= 0; --i) {
+		for (int i = b.Size()-1; i >= 0; --i) {
 			x[i] = z[i];
-			for (int j = b.size()-1; j > i; --j) {
+			for (int j = b.Size()-1; j > i; --j) {
 				x[i] -= U[i][j] * x[j];
 			}
 			x[i] /= U[i][i];

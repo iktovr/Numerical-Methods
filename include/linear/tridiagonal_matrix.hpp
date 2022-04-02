@@ -28,7 +28,7 @@ public:
 	}
 
 	Vector<T> Solve(const Vector<T>& b) {
-		if (b.size() != _size) {
+		if (b.Size() != _size) {
 			throw "Dimension mismatch";
 		}
 

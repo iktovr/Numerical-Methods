@@ -7,7 +7,7 @@
 
 template <class T>
 size_t IterationMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& M, Vector<T>& x, double eps) {
-	if ((A.Size() != b.size()) || (b.size() != M.Size()) || (M.Size() != x.size())) {
+	if ((A.Size() != b.Size()) || (b.Size() != M.Size()) || (M.Size() != x.Size())) {
 		throw "Dimension mismatch";
 	}
 	Matrix<T> alpha = Matrix<T>::Identity(A.Size()) + M * A;
@@ -17,14 +17,14 @@ size_t IterationMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& 
 	T alpha_norm = alpha.Norm();
 	size_t count = 0;
 	double eps_k;
-	Vector<T> next_x;
+	Vector<T> next_x(x.Size());
 
 	do {
 		next_x = alpha * x + beta;
 		if (alpha_norm < 1) {
-			eps_k = alpha_norm / (1.0 - alpha_norm) * Norm(next_x - x);
+			eps_k = alpha_norm / (1.0 - alpha_norm) * (next_x - x).Norm();
 		} else {
-			eps_k = Norm(next_x - x);
+			eps_k = (next_x - x).Norm();
 		}
 		std::swap(next_x, x);
 		++count;
@@ -44,7 +44,7 @@ size_t JacobiMethod(const Matrix<T>& A, const Vector<T>& b, Vector<T>& x, double
 
 template <class T>
 size_t SeidelMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& M, Vector<T>& x, double eps) {
-	if ((A.Size() != b.size()) || (b.size() != M.Size()) || (M.Size() != x.size())) {
+	if ((A.Size() != b.Size()) || (b.Size() != M.Size()) || (M.Size() != x.Size())) {
 		throw "Dimension mismatch";
 	}
 	Matrix<T> alpha = Matrix<T>::Identity(A.Size()) + M * A;
@@ -62,23 +62,23 @@ size_t SeidelMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& M, 
 	T alpha2_norm = alpha2.Norm();
 	size_t count = 0;
 	double eps_k;
-	Vector<T> next_x(x.size());
+	Vector<T> next_x(x.Size());
 
 	do {
-		for (size_t i = 0; i < x.size(); ++i) {
+		for (size_t i = 0; i < x.Size(); ++i) {
 			next_x[i] = beta[i];
 			for (size_t j = 0; j < i; ++j) {
 				next_x[i] += alpha[i][j] * next_x[j];
 			}
-			for (size_t j = i; j < x.size(); ++j) {
+			for (size_t j = i; j < x.Size(); ++j) {
 				next_x[i] += alpha[i][j] * x[j];
 			}
 		}
 
 		if (alpha_norm < 1) {
-			eps_k = alpha2_norm / (1.0 - alpha_norm) * Norm(next_x - x);
+			eps_k = alpha2_norm / (1.0 - alpha_norm) * (next_x - x).Norm();
 		} else {
-			eps_k = Norm(next_x - x);
+			eps_k = (next_x - x).Norm();
 		}
 		std::swap(next_x, x);
 		++count;

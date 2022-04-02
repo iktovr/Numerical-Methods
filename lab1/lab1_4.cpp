@@ -4,6 +4,14 @@
 #include "../include/linear/matrix.hpp"
 #include "../include/linear/rotation_method.hpp"
 
+template <class T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
+	for (size_t i = 0; i < vec.size(); ++i) {
+		os << std::setw(8) << vec[i] << ' ';
+	}
+	return os;
+}
+
 int main() {
 	std::cout.precision(3);
 	std::cout << std::fixed;
