@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "tridiagonal_matrix.hpp"
+#include "../include/linear/tridiagonal_matrix.hpp"
 
 int main() {
 	std::cout.precision(3);

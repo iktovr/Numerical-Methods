@@ -4,8 +4,7 @@
 #include <iostream>
 #include <iomanip>
 
-template <class T>
-using Vector = std::vector<T>;
+#include "vector.hpp"
 
 template <class T>
 class TDMatrix {
@@ -30,7 +29,7 @@ public:
 
 	Vector<T> Solve(const Vector<T>& b) {
 		if (b.size() != _size) {
-			return Vector<T>();
+			throw "Dimension mismatch";
 		}
 
 		Vector<T> p(_size-1), q(_size-1), x(_size);
@@ -78,21 +77,5 @@ std::istream& operator>>(std::istream& is, TDMatrix<T>& matrix) {
 		}
 	}
 	is >> matrix[matrix.Size()-1][0] >> matrix[matrix.Size()-1][1];
-	return is;
-}
-
-template <class T>
-std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
-	for (size_t i = 0; i < vec.size(); ++i) {
-		os << std::setw(8) << vec[i] << ' ';
-	}
-	return os;
-}
-
-template <class T>
-std::istream& operator>>(std::istream& is, Vector<T>& vec) {
-	for (size_t i = 0; i < vec.size(); ++i) {
-		is >> vec[i];
-	}
 	return is;
 }

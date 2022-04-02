@@ -1,8 +1,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include "matrix.hpp"
-#include "rotation_method.hpp"
+#include "../include/linear/matrix.hpp"
+#include "../include/linear/rotation_method.hpp"
 
 int main() {
 	std::cout.precision(3);

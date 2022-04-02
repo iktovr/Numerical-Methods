@@ -5,6 +5,7 @@
 #include <complex>
 
 #include "matrix.hpp"
+#include "vector.hpp"
 
 template <class T>
 void QR_Decomposition(const Matrix<T>& A, Matrix<T>& Q, Matrix<T>& R) {

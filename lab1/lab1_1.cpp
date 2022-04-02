@@ -1,8 +1,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include "matrix.hpp"
-#include "lup.hpp"
+#include "../include/linear/matrix.hpp"
+#include "../include/linear/vector.hpp"
+#include "../include/linear/lup.hpp"
 
 int main() {
 	std::cout.precision(3);

@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "matrix.hpp"
+#include "vector.hpp"
 
 template <class T>
 struct LUP {
@@ -32,7 +33,7 @@ struct LUP {
 
 	Vector<T> Solve(Vector<T> b) {
 		if (b.size() != L.Size()) {
-			return Vector<T>();
+			throw "Dimension mismatch";
 		}
 		for (const std::pair<size_t, size_t>& p: P) {
 			std::swap(b[p.first], b[p.second]);

@@ -2,8 +2,8 @@
 #include <iomanip>
 #include <complex>
 
-#include "matrix.hpp"
-#include "qr_decomposition.hpp"
+#include "../include/linear/matrix.hpp"
+#include "../include/linear/qr_decomposition.hpp"
 
 int main() {
 	std::cout.precision(4);

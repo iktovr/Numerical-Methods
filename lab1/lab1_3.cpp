@@ -1,8 +1,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include "matrix.hpp"
-#include "iteration_solvers.hpp"
+#include "../include/linear/matrix.hpp"
+#include "../include/linear/vector.hpp"
+#include "../include/linear/iteration_solvers.hpp"
 
 int main() {
 	std::cout.precision(6);

@@ -5,8 +5,7 @@
 #include <iomanip>
 #include <cmath>
 
-template <class T>
-using Vector = std::vector<T>;
+#include "vector.hpp"
 
 template <class T>
 class Matrix {
@@ -25,6 +24,10 @@ public:
 
 	const std::vector<T>& operator[](size_t index) const {
 		return _data[index];
+	}
+
+	size_t Size() const {
+		return _size;
 	}
 
 	static Matrix<T> Identity(size_t n) {
@@ -59,20 +62,6 @@ public:
 		return Matrix<T>::Identity(n) - vv * (2.0 / (v * v));
 	}
 
-	Matrix<T> Transpose() {
-		Matrix<T> result(*this);
-		for (size_t i = 1; i < _size; ++i) {
-			for (size_t j = 0; j < i; ++j) {
-				std::swap(result[i][j], result[j][i]);
-			}
-		}
-		return result;
-	}
-
-	size_t Size() const {
-		return _size;
-	}
-
 	T Norm() const {
 		T norm = 0;
 		for (const std::vector<T>& row: _data) {
@@ -85,6 +74,82 @@ public:
 			}
 		}
 		return norm;
+	}
+
+	Matrix<T> Transpose() {
+		Matrix<T> result(*this);
+		for (size_t i = 1; i < _size; ++i) {
+			for (size_t j = 0; j < i; ++j) {
+				std::swap(result[i][j], result[j][i]);
+			}
+		}
+		return result;
+	}
+
+	void SwapRows(size_t i, size_t j) {
+		if (i >= _size || j >= _size) {
+			return;
+		}
+
+		std::swap(_data[i], _data[j]);
+	}
+
+	void SwapRows(std::vector<std::pair<size_t, size_t>>& P) {
+		for (const std::pair<size_t, size_t>& p: P) {
+			std::swap(_data[p.first], _data[p.second]);
+		}
+	}
+
+	void SwapColumns(size_t i, size_t j) {
+		if (i >= _size || j >= _size) {
+			return;
+		}
+
+		for (size_t k = 0; k < _size; ++k) {
+			std::swap(_data[k][i], _data[k][j]);
+		}
+	}
+
+	bool Decompose(Matrix<T>& L, Matrix<T>& U, std::vector<std::pair<size_t, size_t>>& P) const {
+		if (_size != L.Size() || _size != U.Size()) {
+			throw "Dimension mismatch";
+		}
+		P.clear();
+		for (size_t i = 0; i < _size; ++i) {
+			for (size_t j = 0; j < _size; ++j) {
+				L[i][j] = 0;
+				U[i][j] = _data[i][j];
+			}
+			L[i][i] = 1;
+		}
+
+		for (size_t k = 0; k < _size-1; ++k) {
+			T max = U[k][k];
+			size_t max_ind = k;
+			for (size_t i = k+1; i < _size; ++i) {
+				if (U[i][k] > max) {
+					max = U[i][k];
+					max_ind = i;
+				}
+			}
+
+			if (max_ind != k) {
+				P.push_back(std::make_pair(k, max_ind));
+				U.SwapRows(k, max_ind);
+				L.SwapRows(k, max_ind);
+				L.SwapColumns(k, max_ind);
+			}
+
+			for (size_t i = k+1; i < _size; ++i) {
+				L[i][k] = U[i][k] / U[k][k];
+
+				for (size_t j = 0; j < _size; ++j) {
+					U[i][j] -= L[i][k] * U[k][j];
+				}
+			}
+		}
+
+		return true; 
 	}
 
 	template <class U>
@@ -133,7 +198,7 @@ std::istream& operator>>(std::istream& is, Matrix<T>& matrix) {
 template <class T>
 Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
 	if (a.Size() != b.Size()) {
-		return Matrix<T>();
+		throw "Dimension mismatch";
 	}
 	Matrix<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
@@ -149,7 +214,7 @@ Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
 template <class T>
 Matrix<T> operator+(const Matrix<T>& a, const Matrix<T>& b) {
 	if (a.Size() != b.Size()) {
-		return Matrix<T>();
+		throw "Dimension mismatch";
 	}
 	Matrix<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
@@ -163,7 +228,7 @@ Matrix<T> operator+(const Matrix<T>& a, const Matrix<T>& b) {
 template <class T>
 Matrix<T> operator-(const Matrix<T>& a, const Matrix<T>& b) {
 	if (a.Size() != b.Size()) {
-		return Matrix<T>();
+		throw "Dimension mismatch";
 	}
 	Matrix<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
@@ -177,12 +242,12 @@ Matrix<T> operator-(const Matrix<T>& a, const Matrix<T>& b) {
 template <class T>
 Vector<T> operator*(const Matrix<T>& a, const Vector<T>& b) {
 	if (a.Size() != b.size()) {
-		return Vector<T>();
+		throw "Dimension mismatch";
 	}
-	Matrix<T> res(a.Size());
+	Vector<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
 		for (size_t j = 0; j < a.Size(); ++j) {
-			res[i] = a[i][j] * b[j];
+			res[i] += a[i][j] * b[j];
 		}
 	}
 	return res;
@@ -195,83 +260,6 @@ Matrix<T> operator*(const Matrix<T>& a, const T& b) {
 		for (size_t j = 0; j < a.Size(); ++j) {
 			res[i][j] = a[i][j] * b;
 		}
-	}
-	return res;
-}
-
-template <class T>
-std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
-	for (size_t i = 0; i < vec.size(); ++i) {
-		os << std::setw(8) << vec[i] << ' ';
-	}
-	return os;
-}
-
-template <class T>
-std::istream& operator>>(std::istream& is, Vector<T>& vec) {
-	for (size_t i = 0; i < vec.size(); ++i) {
-		is >> vec[i];
-	}
-	return is;
-}
-
-template <class T>
-T Norm(Vector<T> vec, int p = 0) {
-	T norm = 0;
-	if (p > 0) {
-		for (const T& a: vec) {
-			norm += std::pow(a, p);
-		}
-		norm = std::pow(norm, 1.0 / p);
-	} else {
-		for (const T& a: vec) {
-			norm = std::max(norm, std::abs(a));
-		}
-	}
-	return norm;
-}
-
-template<class T>
-Vector<T> operator-(const Vector<T>& a, const Vector<T>& b) {
-	if (a.size() != b.size()) {
-		return Vector<T>();
-	}
-	Vector<T> res(a);
-	for (size_t i = 0; i < b.size(); ++i) {
-		res[i] -= b[i];
-	}
-	return res;
-}
-
-template<class T>
-Vector<T> operator+(const Vector<T>& a, const Vector<T>& b) {
-	if (a.size() != b.size()) {
-		return Vector<T>();
-	}
-	Vector<T> res(a);
-	for (size_t i = 0; i < b.size(); ++i) {
-		res[i] += b[i];
-	}
-	return res;
-}
-
-template<class T>
-Vector<T> operator-(const Vector<T>& a) {
-	Vector<T> res(a);
-	for (size_t i = 0; i < a.size(); ++i) {
-		res[i] *= -1;
-	}
-	return res;
-}
-
-template<class T>
-T operator*(const Vector<T>& a, const Vector<T>& b) {
-	if (a.size() != b.size()) {
-		return T();
-	}
-	T res = 0;
-	for (size_t i = 0; i < b.size(); ++i) {
-		res += a[i] * b[i];
 	}
 	return res;
 }

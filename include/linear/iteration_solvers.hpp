@@ -3,11 +3,12 @@
 #include <cmath>
 
 #include "matrix.hpp"
+#include "vector.hpp"
 
 template <class T>
 size_t IterationMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& M, Vector<T>& x, double eps) {
 	if ((A.Size() != b.size()) || (b.size() != M.Size()) || (M.Size() != x.size())) {
-		return 0;
+		throw "Dimension mismatch";
 	}
 	Matrix<T> alpha = Matrix<T>::Identity(A.Size()) + M * A;
 	Vector<T> beta = -(M * b);
@@ -44,7 +45,7 @@ size_t JacobiMethod(const Matrix<T>& A, const Vector<T>& b, Vector<T>& x, double
 template <class T>
 size_t SeidelMethod(const Matrix<T>& A, const Vector<T>& b, const Matrix<T>& M, Vector<T>& x, double eps) {
 	if ((A.Size() != b.size()) || (b.size() != M.Size()) || (M.Size() != x.size())) {
-		return 0;
+		throw "Dimension mismatch";
 	}
 	Matrix<T> alpha = Matrix<T>::Identity(A.Size()) + M * A;
 	Vector<T> beta = -(M * b);

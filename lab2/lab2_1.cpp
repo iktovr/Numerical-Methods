@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 
-#include "solvers.hpp"
+#include "../include/nonlinear/solvers.hpp"
 
 int main() {
 	std::cout.precision(8);
