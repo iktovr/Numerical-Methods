@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <initializer_list>
 
 #include "vector.hpp"
 
@@ -17,6 +18,14 @@ private:
 
 public:
 	Matrix(size_t n) : _data(n, std::vector<T>(n)), _size(n) { }
+
+	Matrix(std::initializer_list<std::vector<T>> list) : _data(list), _size(_data.size()) {
+		for (const std::vector<T>& row: _data) {
+			if (row.size() != _size) {
+				throw "Incorrect initializer list";
+			}
+		}
+	}
 
 	std::vector<T>& operator[](size_t index) {
 		return _data[index];

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <initializer_list>
 
 template <class T>
 class Vector {
@@ -15,6 +16,8 @@ private:
 
 public:
 	Vector(size_t n) : _data(n), _size(n) { }
+
+	Vector(std::initializer_list<T> list) : _data(list), _size(_data.size()) { }
 
 	T& operator[](size_t index) {
 		return _data[index];
@@ -42,6 +45,16 @@ public:
 		}
 		return norm;
 	}
+
+	Vector<T>& operator+=(const Vector<T>& other) {
+		if (_size != other.Size()) {
+			throw "Dimension mismatch";
+		}
+		for (size_t i = 0; i < _size; ++i) {
+			_data[i] += other[i];
+		}
+		return *this;
+	} 
 
 	template <class U>
 	friend std::ostream& operator<<(std::ostream&, const Vector<U>&);

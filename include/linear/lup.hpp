@@ -12,7 +12,17 @@ struct LUP {
 	Matrix<T> U;
 	std::vector<std::pair<size_t, size_t>> P;
 
+	LUP(size_t n): L(n), U(n), P() { }
+
 	LUP(const Matrix<T>& matrix): L(matrix.Size()), U(matrix.Size()), P() {
+		matrix.Decompose(L, U, P);
+	}
+
+	void Assign(const Matrix<T>& matrix) {
+		if (L.Size() != matrix.Size()) {
+			L = Matrix<T>(matrix.Size());
+			U = Matrix<T>(matrix.Size());
+		}
 		matrix.Decompose(L, U, P);
 	}
 
