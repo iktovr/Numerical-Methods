@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <stdexcept>
 
 #include "vector.hpp"
 
@@ -29,7 +30,7 @@ public:
 
 	Vector<T> Solve(const Vector<T>& b) {
 		if (b.Size() != _size) {
-			throw "Dimension mismatch";
+			throw std::runtime_error("Dimension mismatch");
 		}
 
 		Vector<T> p(_size-1), q(_size-1), x(_size);

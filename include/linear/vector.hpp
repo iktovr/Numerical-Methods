@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <cmath>
 #include <initializer_list>
+#include <stdexcept>
 
 template <class T>
 class Vector {
@@ -48,7 +49,7 @@ public:
 
 	Vector<T>& operator+=(const Vector<T>& other) {
 		if (_size != other.Size()) {
-			throw "Dimension mismatch";
+			throw std::runtime_error("Dimension mismatch");
 		}
 		for (size_t i = 0; i < _size; ++i) {
 			_data[i] += other[i];
@@ -95,7 +96,7 @@ std::istream& operator>>(std::istream& is, Vector<T>& vec) {
 template<class T>
 Vector<T> operator-(const Vector<T>& a, const Vector<T>& b) {
 	if (a.Size() != b.Size()) {
-		throw "Dimension mismatch";
+		throw std::runtime_error("Dimension mismatch");
 	}
 	Vector<T> res(a);
 	for (size_t i = 0; i < b.Size(); ++i) {
@@ -107,7 +108,7 @@ Vector<T> operator-(const Vector<T>& a, const Vector<T>& b) {
 template<class T>
 Vector<T> operator+(const Vector<T>& a, const Vector<T>& b) {
 	if (a.Size() != b.Size()) {
-		throw "Dimension mismatch";
+		throw std::runtime_error("Dimension mismatch");
 	}
 	Vector<T> res(a);
 	for (size_t i = 0; i < b.Size(); ++i) {
@@ -128,7 +129,7 @@ Vector<T> operator-(const Vector<T>& a) {
 template<class T>
 T operator*(const Vector<T>& a, const Vector<T>& b) {
 	if (a.Size() != b.Size()) {
-		throw "Dimension mismatch";
+		throw std::runtime_error("Dimension mismatch");
 	}
 	T res = 0;
 	for (size_t i = 0; i < b.Size(); ++i) {

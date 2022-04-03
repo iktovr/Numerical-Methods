@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <cmath>
 #include <initializer_list>
+#include <stdexcept>
 
 #include "vector.hpp"
 
@@ -22,7 +23,7 @@ public:
 	Matrix(std::initializer_list<std::vector<T>> list) : _data(list), _size(_data.size()) {
 		for (const std::vector<T>& row: _data) {
 			if (row.size() != _size) {
-				throw "Incorrect initializer list";
+				throw std::runtime_error("Incorrect initializer list");
 			}
 		}
 	}
@@ -121,7 +122,7 @@ public:
 
 	bool Decompose(Matrix<T>& L, Matrix<T>& U, std::vector<std::pair<size_t, size_t>>& P) const {
 		if (_size != L.Size() || _size != U.Size()) {
-			throw "Dimension mismatch";
+			throw std::runtime_error("Dimension mismatch");
 		}
 		P.clear();
 		for (size_t i = 0; i < _size; ++i) {
@@ -207,7 +208,7 @@ std::istream& operator>>(std::istream& is, Matrix<T>& matrix) {
 template <class T>
 Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
 	if (a.Size() != b.Size()) {
-		throw "Dimension mismatch";
+		throw std::runtime_error("Dimension mismatch");
 	}
 	Matrix<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
@@ -223,7 +224,7 @@ Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
 template <class T>
 Matrix<T> operator+(const Matrix<T>& a, const Matrix<T>& b) {
 	if (a.Size() != b.Size()) {
-		throw "Dimension mismatch";
+		throw std::runtime_error("Dimension mismatch");
 	}
 	Matrix<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
@@ -237,7 +238,7 @@ Matrix<T> operator+(const Matrix<T>& a, const Matrix<T>& b) {
 template <class T>
 Matrix<T> operator-(const Matrix<T>& a, const Matrix<T>& b) {
 	if (a.Size() != b.Size()) {
-		throw "Dimension mismatch";
+		throw std::runtime_error("Dimension mismatch");
 	}
 	Matrix<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
@@ -251,7 +252,7 @@ Matrix<T> operator-(const Matrix<T>& a, const Matrix<T>& b) {
 template <class T>
 Vector<T> operator*(const Matrix<T>& a, const Vector<T>& b) {
 	if (a.Size() != b.Size()) {
-		throw "Dimension mismatch";
+		throw std::runtime_error("Dimension mismatch");
 	}
 	Vector<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {

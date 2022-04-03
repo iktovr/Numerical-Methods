@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <vector>
+#include <stdexcept>
 
 #include "../linear/matrix.hpp"
 #include "../linear/vector.hpp"
@@ -23,7 +24,7 @@ public:
 	Matrix(std::initializer_list<std::vector<function_t>> list) : _data(list), _size(_data.size()) {
 		for (const std::vector<function_t>& row: _data) {
 			if (row.size() != _size) {
-				throw "Incorrect initializer list";
+				throw std::runtime_error("Incorrect initializer list");
 			}
 		}
 	}

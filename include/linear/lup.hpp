@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <utility>
+#include <stdexcept>
 
 #include "matrix.hpp"
 #include "vector.hpp"
@@ -43,7 +44,7 @@ struct LUP {
 
 	Vector<T> Solve(Vector<T> b) {
 		if (b.Size() != L.Size()) {
-			throw "Dimension mismatch";
+			throw std::runtime_error("Dimension mismatch");
 		}
 		for (const std::pair<size_t, size_t>& p: P) {
 			std::swap(b[p.first], b[p.second]);
