@@ -7,6 +7,9 @@
 
 #include "../include/nonlinear/system_solvers.hpp"
 
+template <class T>
+using interval_t = std::pair<Vector<T>, Vector<T>>;
+
 int main() {
 	std::cout.precision(8);
 	std::cout << std::fixed;
@@ -21,24 +24,26 @@ int main() {
 		{[](Vector<double> x){ return 2 * (x[0] - 1.5); }, [](Vector<double> x){ return 2 * (x[1] - 1.5); }}
 	};
 
-	std::vector<Vector<double>> start{{-2, 2}, {4, 1}};
+	std::vector<interval_t<double>> intervals{{{-2, 2}, {-1, 3}}, {{4, 0.5}, {4.8, 1.2}}};
 
-	int k;
+	int k, steps;
 	double eps;
-	std::cin >> eps >> k;
+	std::cin >> eps >> steps >> k;
 
 	size_t iter_count;
+	Vector<double> x(2);
 
 	std::cout << "Метод простой итерации:\n";
-	for (Vector<double> x: start) {
-		iter_count = IterationMethod(x, F, J, eps);
+	for (const auto& [a, b]: intervals) {
+		x = a;
+		iter_count = IterationMethod(x, a, b, F, J, eps, steps);
 
 		std::cout << "Решение: " << x << "\nКоличество итераций: " << iter_count << '\n';
 	}
 
 	std::cout << '\n';
 	std::cout << "Метод Ньютона:\n";
-	for (Vector<double> x: start) {
+	for (auto [x, _]: intervals) {
 		iter_count = NewtonMethod(x, F, J, eps, k);
 
 		std::cout << "Решение: " << x << "\nКоличество итераций: " << iter_count << '\n';
