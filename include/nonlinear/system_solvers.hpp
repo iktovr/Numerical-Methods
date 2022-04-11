@@ -92,10 +92,10 @@ template <class T>
 using function_t = std::function<T(Vector<T>)>;
 
 template <class T>
-T TrivialMaximum(const Vector<T>& a, const Vector<T>& b, const function_t<T>& f, int steps, T min, size_t i = 0, Vector<T> x = {0, 0}) {
+T TrivialMaximum(const Vector<T>& a, const Vector<T>& b, const function_t<T>& f, int steps, T min, double eps, size_t i = 0, Vector<T> x = {0, 0}) {
 	T d = (b[i] - a[i]) / steps;
 	T max = min, cur;
-	for (T s = a[i]; s <= b[i]; s += d) {
+	for (T s = a[i]; s < b[i] + eps; s += d) {
 		x[i] = s;
 		if (i == a.Size() - 1) {
 			cur = f(x);
@@ -103,7 +103,7 @@ T TrivialMaximum(const Vector<T>& a, const Vector<T>& b, const function_t<T>& f,
 				max = cur;
 			}
 		} else {
-			cur = TrivialMaximum(a, b, f, steps, min, i+1, x);
+			cur = TrivialMaximum(a, b, f, steps, min, eps, i+1, x);
 			if (cur > max) {
 				max = cur;
 			}
@@ -120,7 +120,7 @@ size_t IterationMethod(Vector<T>& x, const Vector<T>& a, const Vector<T>& b, con
 
 	Matrix<T> lambda = LUP(J(x)).Invert(), E = Matrix<T>::Identity(x.Size());
 	function_t<T> Jphi = [&E, &lambda, &J](Vector<T> x){ return (E - lambda * J(x)).Norm(); };
-	T q = TrivialMaximum<T>(a, b, Jphi, steps, -1);
+	T q = TrivialMaximum<T>(a, b, Jphi, steps, -1, eps);
 	if (q > 1 - eps) {
 		throw std::runtime_error("Incorrect interval");
 	}
