@@ -7,6 +7,7 @@
 #include "../linear/matrix.hpp"
 #include "../linear/vector.hpp"
 #include "../linear/lup.hpp"
+#include "../function/optimization.hpp"
 
 template <class T, class... Args>
 class Matrix<std::function<T(Args...)>> {
@@ -92,35 +93,29 @@ template <class T>
 using function_t = std::function<T(Vector<T>)>;
 
 template <class T>
-T TrivialMaximum(const Vector<T>& a, const Vector<T>& b, const function_t<T>& f, int steps, T min, double eps, size_t i = 0, Vector<T> x = {0, 0}) {
-	T d = (b[i] - a[i]) / steps;
-	T max = min, cur;
-	for (T s = a[i]; s < b[i] + eps; s += d) {
-		x[i] = s;
-		if (i == a.Size() - 1) {
-			cur = f(x);
-			if (cur > max) {
-				max = cur;
-			}
-		} else {
-			cur = TrivialMaximum(a, b, f, steps, min, eps, i+1, x);
-			if (cur > max) {
-				max = cur;
-			}
-		}
-	}
-	return max;
-}
-
-template <class T>
-size_t IterationMethod(Vector<T>& x, const Vector<T>& a, const Vector<T>& b, const Vector<function_t<T>>& F, const Matrix<function_t<T>>& J, double eps, int steps) {
+size_t IterationMethod(Vector<T>& x, const Vector<T>& a, const Vector<T>& b, const Vector<function_t<T>>& F, const Matrix<function_t<T>>& J, double eps) {
 	double eps_k;
 	Vector<T> next_x(x.Size());
 	size_t iter_count = 0;
 
 	Matrix<T> lambda = LUP(J(x)).Invert(), E = Matrix<T>::Identity(x.Size());
 	function_t<T> Jphi = [&E, &lambda, &J](Vector<T> x){ return (E - lambda * J(x)).Norm(); };
-	T q = TrivialMaximum<T>(a, b, Jphi, steps, -1, eps);
+
+	std::function<bool(Vector<T>)> region = [&a, &b](Vector<T> x) {
+		bool in = true;
+		for (size_t i = 0; i < x.Size(); ++i) {
+			if (x[i] < a[i] || x[i] > b[i]) {
+				in = false;
+			}
+		}
+		return in;
+	};
+	T r = b[0] - a[0];
+	for (size_t i = 1; i < a.Size(); ++i) {
+		r = std::min(r, b[i] - a[i]);
+	}
+
+	T q = Jphi(RandomSearch<T, std::greater<T>>(Jphi, a, eps, r, 10, 5, region));
 	if (q > 1 - eps) {
 		throw std::runtime_error("Incorrect interval");
 	}

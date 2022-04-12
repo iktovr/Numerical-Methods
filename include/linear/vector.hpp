@@ -18,6 +18,8 @@ private:
 public:
 	Vector(size_t n) : _data(n), _size(n) { }
 
+	Vector(size_t n, T value) : _data(n, value), _size(n) { }
+
 	Vector(std::initializer_list<T> list) : _data(list), _size(_data.size()) { }
 
 	T& operator[](size_t index) {
@@ -55,7 +57,14 @@ public:
 			_data[i] += other[i];
 		}
 		return *this;
-	} 
+	}
+
+	Vector<T>& operator*=(const T& value) {
+		for (size_t i = 0; i < _size; ++i) {
+			_data[i] *= value;
+		}
+		return *this;
+	}
 
 	template <class U>
 	friend std::ostream& operator<<(std::ostream&, const Vector<U>&);
@@ -74,6 +83,9 @@ public:
 
 	template<class U>
 	friend U operator*(const Vector<U>&, const Vector<U>&);
+
+	template<class U>
+	friend Vector<U> operator*(const Vector<U>&, const U&);
 };
 
 
@@ -134,6 +146,15 @@ T operator*(const Vector<T>& a, const Vector<T>& b) {
 	T res = 0;
 	for (size_t i = 0; i < b.Size(); ++i) {
 		res += a[i] * b[i];
+	}
+	return res;
+}
+
+template<class T>
+Vector<T> operator*(const Vector<T>& a, const T& b) {
+	Vector<T> res(a);
+	for (size_t i = 0; i < a.Size(); ++i) {
+		res[i] *= b;
 	}
 	return res;
 }

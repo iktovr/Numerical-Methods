@@ -26,9 +26,9 @@ int main() {
 
 	std::vector<interval_t<double>> intervals{{{-2, 2}, {-1, 3}}, {{4, 0.5}, {4.8, 1.2}}};
 
-	int k, steps;
+	int k;
 	double eps;
-	std::cin >> eps >> steps >> k;
+	std::cin >> eps >> k;
 
 	size_t iter_count;
 	Vector<double> x(2);
@@ -36,7 +36,7 @@ int main() {
 	std::cout << "Метод простой итерации:\n";
 	for (const auto& [a, b]: intervals) {
 		x = a;
-		iter_count = IterationMethod(x, a, b, F, J, eps, steps);
+		iter_count = IterationMethod(x, a, b, F, J, eps);
 
 		std::cout << "Решение: " << x << "\nКоличество итераций: " << iter_count << '\n';
 	}
