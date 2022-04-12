@@ -78,12 +78,6 @@ public:
 		}
 		return *this;
 	}
-
-	template <class U>
-	friend Polynomial<U> operator*(const Polynomial<U>&, const Polynomial<U>&);
-
-	template <class U>
-	friend std::ostream& operator<<(std::ostream&, const Polynomial<U>&);
 };
 
 template <class T>

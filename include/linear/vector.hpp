@@ -65,27 +65,6 @@ public:
 		}
 		return *this;
 	}
-
-	template <class U>
-	friend std::ostream& operator<<(std::ostream&, const Vector<U>&);
-
-	template <class U>
-	friend std::istream& operator>>(std::istream&, Vector<U>&);
-
-	template<class U>
-	friend Vector<U> operator-(const Vector<U>&, const Vector<U>&);
-
-	template<class U>
-	friend Vector<U> operator+(const Vector<U>&, const Vector<U>&);
-
-	template<class U>
-	friend Vector<U> operator-(const Vector<U>&);
-
-	template<class U>
-	friend U operator*(const Vector<U>&, const Vector<U>&);
-
-	template<class U>
-	friend Vector<U> operator*(const Vector<U>&, const U&);
 };
 
 

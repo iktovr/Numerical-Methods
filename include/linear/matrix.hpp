@@ -161,27 +161,6 @@ public:
 
 		return true; 
 	}
-
-	template <class U>
-	friend std::ostream& operator<<(std::ostream&, const Matrix<U>&);
-
-	template <class U>
-	friend std::istream& operator>>(std::istream&, Matrix<U>&);
-
-	template <class U>
-	friend Matrix<U> operator*(const Matrix<U>&, const Matrix<U>&);
-
-	template <class U>
-	friend Matrix<U> operator+(const Matrix<U>&, const Matrix<U>&);
-
-	template <class U>
-	friend Matrix<U> operator-(const Matrix<U>&, const Matrix<U>&);
-
-	template <class U>
-	friend Vector<U> operator*(const Matrix<U>&, const Vector<U>&);
-
-	template <class U>
-	friend Matrix<U> operator*(const Matrix<U>&, const U&);
 };
 
 template <class T>
