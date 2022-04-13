@@ -184,8 +184,8 @@ std::istream& operator>>(std::istream& is, Matrix<T>& matrix) {
 	return is;
 }
 
-template <class T>
-Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
+template <class T, class U>
+Matrix<T> operator*(const Matrix<T>& a, const Matrix<U>& b) {
 	if (a.Size() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
@@ -200,8 +200,8 @@ Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
 	return res;
 }
 
-template <class T>
-Matrix<T> operator+(const Matrix<T>& a, const Matrix<T>& b) {
+template <class T, class U>
+Matrix<T> operator+(const Matrix<T>& a, const Matrix<U>& b) {
 	if (a.Size() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
@@ -214,8 +214,8 @@ Matrix<T> operator+(const Matrix<T>& a, const Matrix<T>& b) {
 	return res;
 }
 
-template <class T>
-Matrix<T> operator-(const Matrix<T>& a, const Matrix<T>& b) {
+template <class T, class U>
+Matrix<T> operator-(const Matrix<T>& a, const Matrix<U>& b) {
 	if (a.Size() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
@@ -228,8 +228,8 @@ Matrix<T> operator-(const Matrix<T>& a, const Matrix<T>& b) {
 	return res;
 }
 
-template <class T>
-Vector<T> operator*(const Matrix<T>& a, const Vector<T>& b) {
+template <class T, class U>
+Vector<T> operator*(const Matrix<T>& a, const Vector<U>& b) {
 	if (a.Size() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
@@ -242,8 +242,8 @@ Vector<T> operator*(const Matrix<T>& a, const Vector<T>& b) {
 	return res;
 }
 
-template <class T>
-Matrix<T> operator*(const Matrix<T>& a, const T& b) {
+template <class T, class U>
+Matrix<T> operator*(const Matrix<T>& a, const U& b) {
 	Matrix<T> res(a.Size());
 	for (size_t i = 0; i < a.Size(); ++i) {
 		for (size_t j = 0; j < a.Size(); ++j) {

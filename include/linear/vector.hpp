@@ -53,7 +53,8 @@ public:
 		return norm;
 	}
 
-	Vector<T>& operator+=(const Vector<T>& other) {
+	template <class U>
+	Vector<T>& operator+=(const Vector<U>& other) {
 		if (_size != other.Size()) {
 			throw std::runtime_error("Dimension mismatch");
 		}
@@ -63,7 +64,8 @@ public:
 		return *this;
 	}
 
-	Vector<T>& operator*=(const T& value) {
+	template <class U>
+	Vector<T>& operator*=(const U& value) {
 		for (size_t i = 0; i < _size; ++i) {
 			_data[i] *= value;
 		}
@@ -96,8 +98,8 @@ std::istream& operator>>(std::istream& is, Vector<T>& vec) {
 	return is;
 }
 
-template<class T>
-Vector<T> operator-(const Vector<T>& a, const Vector<T>& b) {
+template<class T, class U>
+Vector<T> operator-(const Vector<T>& a, const Vector<U>& b) {
 	if (a.Size() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
@@ -108,8 +110,8 @@ Vector<T> operator-(const Vector<T>& a, const Vector<T>& b) {
 	return res;
 }
 
-template<class T>
-Vector<T> operator+(const Vector<T>& a, const Vector<T>& b) {
+template<class T, class U>
+Vector<T> operator+(const Vector<T>& a, const Vector<U>& b) {
 	if (a.Size() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
@@ -129,8 +131,8 @@ Vector<T> operator-(const Vector<T>& a) {
 	return res;
 }
 
-template<class T>
-T operator*(const Vector<T>& a, const Vector<T>& b) {
+template<class T, class U>
+T operator*(const Vector<T>& a, const Vector<U>& b) {
 	if (a.Size() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
@@ -141,8 +143,8 @@ T operator*(const Vector<T>& a, const Vector<T>& b) {
 	return res;
 }
 
-template<class T>
-Vector<T> operator*(const Vector<T>& a, const T& b) {
+template<class T, class U>
+Vector<T> operator*(const Vector<T>& a, const U& b) {
 	Vector<T> res(a);
 	for (size_t i = 0; i < a.Size(); ++i) {
 		res[i] *= b;

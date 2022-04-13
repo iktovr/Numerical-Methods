@@ -48,7 +48,8 @@ public:
 		_data.assign(degree + 1, value);
 	}
 
-	Polynomial<T>& operator+=(const Polynomial<T>& other) {
+	template <class U>
+	Polynomial<T>& operator+=(const Polynomial<U>& other) {
 		size_t len = std::min(_data.size(), other.Size());
 		for (size_t i = 0; i < len; ++i) {
 			_data[i] += other[i];
@@ -61,7 +62,8 @@ public:
 		return *this;
 	}
 
-	Polynomial<T>& operator*=(const Polynomial<T>& other) {
+	template <class U>
+	Polynomial<T>& operator*=(const Polynomial<U>& other) {
 		std::vector<T> self = _data;
 		Assign(Degree() + other.Degree());
 		for (size_t i = 0; i < other.Size(); ++i) {
@@ -72,7 +74,8 @@ public:
 		return *this;
 	}
 
-	Polynomial<T>& operator*=(const T& value) {
+	template <class U>
+	Polynomial<T>& operator*=(const U& value) {
 		for (size_t i = 0; i < _data.size(); ++i) {
 			_data[i] *= value;
 		}
@@ -100,8 +103,8 @@ std::ostream& operator<<(std::ostream& os, const Polynomial<T>& p) {
 	return os;
 }
 
-template<class T>
-Polynomial<T> operator*(const Polynomial<T>& a, const Polynomial<T>& b) {
+template<class T, class U>
+Polynomial<T> operator*(const Polynomial<T>& a, const Polynomial<U>& b) {
 	Polynomial<T> res(a.Degree() + b.Degree());
 	for (size_t i = 0; i < a.Size(); ++i) {
 		for (size_t j = 0; j < b.Size(); ++j) {
