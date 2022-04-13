@@ -34,6 +34,10 @@ public:
 		return _size;
 	}
 
+	void Fill(T value = T()) {
+		_data.assign(_size, value);
+	}
+
 	T Norm(int p = 0) {
 		T norm = 0;
 		if (p > 0) {
@@ -62,6 +66,14 @@ public:
 	Vector<T>& operator*=(const T& value) {
 		for (size_t i = 0; i < _size; ++i) {
 			_data[i] *= value;
+		}
+		return *this;
+	}
+
+	template <class U>
+	Vector<T>& operator/=(const U& value) {
+		for (size_t i = 0; i < _size; ++i) {
+			_data[i] /= value;
 		}
 		return *this;
 	}

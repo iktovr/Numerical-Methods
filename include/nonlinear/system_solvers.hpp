@@ -110,12 +110,15 @@ size_t IterationMethod(Vector<T>& x, const Vector<T>& a, const Vector<T>& b, con
 		}
 		return in;
 	};
-	T r = b[0] - a[0];
-	for (size_t i = 1; i < a.Size(); ++i) {
-		r = std::min(r, b[i] - a[i]);
+	std::vector<Vector<T>> simplex{a};
+	Vector<T> point = a;
+	for (size_t i = 0; i < a.Size(); ++i) {
+		point[i] = b[i];
+		simplex.push_back(point);
+		point[i] = a[i];
 	}
 
-	T q = Jphi(RandomSearch<T, std::greater<T>>(Jphi, a, eps, r, 10, 5, region));
+	T q = Jphi(NelderMeadMethod<T, std::greater<T>>(Jphi, simplex, eps, region));
 	if (q > 1 - eps) {
 		throw std::runtime_error("Incorrect interval");
 	}

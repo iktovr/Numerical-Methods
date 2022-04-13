@@ -4,29 +4,122 @@
 
 #include <functional>
 #include <random>
+#include <cmath>
 
 #include "../linear/vector.hpp"
 
 template <class T, class Compare = std::less<T>>
-T TrivialSearch(const Vector<T>& a, const Vector<T>& b, const std::function<T(Vector<T>)>& f, int steps, T min_max, double eps, size_t i = 0, Vector<T> x = {0, 0}) {
-	Compare comp;
-	T d = (b[i] - a[i]) / steps;
-	T max_min = min_max, cur;
-	for (T s = a[i]; s < b[i] + eps; s += d) {
-		x[i] = s;
-		if (i == a.Size() - 1) {
-			cur = f(x);
-			if (comp(cur, max_min)) {
-				max_min = cur;
-			}
-		} else {
-			cur = TrivialSearch<T, Compare>(a, b, f, steps, min_max, eps, i+1, x);
-			if (comp(cur, max_min)) {
-				max_min = cur;
-			}
+Vector<T> NelderMeadMethod(const std::function<T(Vector<T>)>& f, std::vector<Vector<T>> simplex, T eps, const std::function<bool(Vector<T>)>& region = [](Vector<T>){ return true; }, T alpha = 1, T beta = 0.5, T gamma = 2) {
+	for (const Vector<T>& point: simplex) {
+		if (point.Size() != simplex.size() - 1) {
+			throw std::runtime_error("Dimension mismatch");
 		}
 	}
-	return max_min;
+
+	Compare comp;
+	T cur_eps = eps + 1;
+	size_t best_i, worst_i;
+	T best, worst, center_value, reflect_value, value, l, r, cur;
+	Vector<T> center(simplex[0].Size()), reflect(center.Size()), point(center.Size());
+	size_t iter_count = 0;
+
+	while (cur_eps > eps) {
+		best_i = worst_i = 0;
+		best = worst = f(simplex[0]);
+		for (size_t i = 0; i < simplex.size(); ++i) {
+			value = f(simplex[i]);
+			if (comp(value, best)) {
+				best = value;
+				best_i = i;
+			}
+			if (comp(worst, value)) {
+				worst = value;
+				worst_i = i;
+			}
+		}
+
+		center.Fill();
+		for (size_t i = 0; i < simplex.size(); ++i) {
+			if (i != worst_i) {
+				center += simplex[i];
+			}
+		}
+		center /= (simplex.size() - 1);
+		center_value = f(center);
+
+		reflect = center + (center - simplex[worst_i]) * alpha;
+		if (!region(reflect)) {
+			l = 0;
+			r = alpha;
+			while (r - l > eps) {
+				cur = (r + l) / 2;
+				if (region(center + (center - simplex[worst_i]) * cur)) {
+					l = cur;
+				} else {
+					r = cur;
+				}
+			}
+			reflect = center + (center - simplex[worst_i]) * l;
+		}
+		reflect_value = f(reflect);
+
+		if (comp(reflect_value, best)) {
+			point = center + (reflect - center) * gamma;
+			if (!region(point)) {
+				l = 0;
+				r = gamma;
+				while (r - l > eps) {
+					cur = (r + l) / 2;
+					if (region(center + (reflect - center) * cur)) {
+						l = cur;
+					} else {
+						r = cur;
+					}
+				}
+				point = center + (reflect - center) * l;
+			}
+
+			value = f(point);
+			if (comp(value, reflect_value)) {
+				simplex[worst_i] = point;
+			} else {
+				simplex[worst_i] = reflect;
+			}
+
+		} else if (comp(reflect_value, worst)) {
+			point = center + (simplex[worst_i] - center) * beta;
+			value = f(point);
+			if (comp(value, reflect_value)) {
+				simplex[worst_i] = point;
+			} else {
+				simplex[worst_i] = reflect;
+			}
+
+		} else {
+			for (size_t i = 0; i < simplex.size(); ++i) {
+				if (i != best_i) {
+					simplex[i] = simplex[best_i] + (simplex[i] - simplex[best_i]) * 0.5;
+				}
+			}
+		}
+
+		cur_eps = 0;
+		for (size_t i = 0; i < simplex.size(); ++i) {
+			cur_eps += std::pow(f(simplex[i]) - center_value, 2);
+		}
+		cur_eps = std::sqrt(cur_eps / (simplex.size() + 1));
+		++iter_count;
+	}
+
+	for (size_t i = 0; i < simplex.size(); ++i) {
+		value = f(simplex[i]);
+		if (comp(value, best)) {
+			best = value;
+			best_i = i;
+		}
+	}
+
+	return simplex[best_i];
 }
 
 template <class T, class Compare = std::less<T>>
@@ -86,4 +179,26 @@ Vector<T> RandomSearch(const std::function<T(Vector<T>)>& f, const Vector<T>& x0
 		++iter_count;
 	}
 	return x;
+}
+
+template <class T, class Compare = std::less<T>>
+T TrivialSearch(const Vector<T>& a, const Vector<T>& b, const std::function<T(Vector<T>)>& f, int steps, T min_max, double eps, size_t i = 0, Vector<T> x = {0, 0}) {
+	Compare comp;
+	T d = (b[i] - a[i]) / steps;
+	T max_min = min_max, cur;
+	for (T s = a[i]; s < b[i] + eps; s += d) {
+		x[i] = s;
+		if (i == a.Size() - 1) {
+			cur = f(x);
+			if (comp(cur, max_min)) {
+				max_min = cur;
+			}
+		} else {
+			cur = TrivialSearch<T, Compare>(a, b, f, steps, min_max, eps, i+1, x);
+			if (comp(cur, max_min)) {
+				max_min = cur;
+			}
+		}
+	}
+	return max_min;
 }
