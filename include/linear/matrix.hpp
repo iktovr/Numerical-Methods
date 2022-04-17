@@ -6,6 +6,7 @@
 #include <cmath>
 #include <initializer_list>
 #include <stdexcept>
+#include <utility>
 
 #include "vector.hpp"
 
@@ -13,16 +14,20 @@ template <class T>
 class Matrix {
 private:
 	std::vector<std::vector<T>> _data;
-	size_t _size;
+	std::pair<size_t, size_t> _size;
 
-	Matrix() : _data(), _size(0) { }
+	Matrix() : _data(), _size{0, 0} { }
 
 public:
-	Matrix(size_t n) : _data(n, std::vector<T>(n)), _size(n) { }
+	Matrix(size_t n) : _data(n, std::vector<T>(n)), _size{n, n} { }
 
-	Matrix(std::initializer_list<std::vector<T>> list) : _data(list), _size(_data.size()) {
+	Matrix(size_t n, size_t m) : _data(n, std::vector<T>(m)), _size{n, m} { }
+
+	Matrix(std::pair<size_t, size_t> size) : _data(size.first, std::vector<T>(size.second)), _size(size) { }
+
+	Matrix(std::initializer_list<std::vector<T>> list) : _data(list), _size(_data.size(), _data.back().size()) {
 		for (const std::vector<T>& row: _data) {
-			if (row.size() != _size) {
+			if (row.size() != _size.second()) {
 				throw std::runtime_error("Incorrect initializer list");
 			}
 		}
@@ -36,8 +41,27 @@ public:
 		return _data[index];
 	}
 
+	bool Square() const {
+		return _size.first == _size.second;
+	}
+
 	size_t Size() const {
+		if (_size.first != _size.second) {
+			throw std::runtime_error("Non-square matrix");
+		}
+		return _size.first;
+	}
+
+	std::pair<size_t, size_t> Sizes() const {
 		return _size;
+	}
+
+	size_t Rows() const {
+		return _size.first;
+	}
+
+	size_t Columns() const {
+		return _size.second;
 	}
 
 	static Matrix<T> Identity(size_t n) {
@@ -87,18 +111,18 @@ public:
 	}
 
 	Matrix<T> Transpose() {
-		Matrix<T> result(*this);
-		for (size_t i = 1; i < _size; ++i) {
-			for (size_t j = 0; j < i; ++j) {
-				std::swap(result[i][j], result[j][i]);
+		Matrix<T> result(std::make_pair(_size.second, _size.first));
+		for (size_t i = 0; i < _size.second; ++i) {
+			for (size_t j = 0; j < _size.first; ++j) {
+				result[i][j] = _data[j][i];
 			}
 		}
 		return result;
 	}
 
 	void SwapRows(size_t i, size_t j) {
-		if (i >= _size || j >= _size) {
-			return;
+		if (i >= _size.first || j >= _size.first) {
+			throw std::runtime_error("Invalid index");
 		}
 
 		std::swap(_data[i], _data[j]);
@@ -106,37 +130,43 @@ public:
 
 	void SwapRows(std::vector<std::pair<size_t, size_t>>& P) {
 		for (const std::pair<size_t, size_t>& p: P) {
+			if (p.first >= _size.first || p.second >= _size.first) {
+				throw std::runtime_error("Invalid index");
+			}
+		}
+
+		for (const std::pair<size_t, size_t>& p: P) {
 			std::swap(_data[p.first], _data[p.second]);
 		}
 	}
 
 	void SwapColumns(size_t i, size_t j) {
-		if (i >= _size || j >= _size) {
-			return;
+		if (i >= _size.second || j >= _size.second) {
+			throw std::runtime_error("Invalid index");
 		}
 
-		for (size_t k = 0; k < _size; ++k) {
+		for (size_t k = 0; k < _size.first; ++k) {
 			std::swap(_data[k][i], _data[k][j]);
 		}
 	}
 
 	bool Decompose(Matrix<T>& L, Matrix<T>& U, std::vector<std::pair<size_t, size_t>>& P) const {
-		if (_size != L.Size() || _size != U.Size()) {
+		if (Size() != L.Size() || Size() != U.Size()) {
 			throw std::runtime_error("Dimension mismatch");
 		}
 		P.clear();
-		for (size_t i = 0; i < _size; ++i) {
-			for (size_t j = 0; j < _size; ++j) {
+		for (size_t i = 0; i < Size(); ++i) {
+			for (size_t j = 0; j < Size(); ++j) {
 				L[i][j] = 0;
 				U[i][j] = _data[i][j];
 			}
 			L[i][i] = 1;
 		}
 
-		for (size_t k = 0; k < _size-1; ++k) {
+		for (size_t k = 0; k < Size()-1; ++k) {
 			T max = U[k][k];
 			size_t max_ind = k;
-			for (size_t i = k+1; i < _size; ++i) {
+			for (size_t i = k+1; i < Size(); ++i) {
 				if (U[i][k] > max) {
 					max = U[i][k];
 					max_ind = i;
@@ -150,10 +180,10 @@ public:
 				L.SwapColumns(k, max_ind);
 			}
 
-			for (size_t i = k+1; i < _size; ++i) {
+			for (size_t i = k+1; i < Size(); ++i) {
 				L[i][k] = U[i][k] / U[k][k];
 
-				for (size_t j = 0; j < _size; ++j) {
+				for (size_t j = 0; j < Size(); ++j) {
 					U[i][j] -= L[i][k] * U[k][j];
 				}
 			}
@@ -165,8 +195,8 @@ public:
 
 template <class T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
-	for (size_t i = 0; i < matrix.Size(); ++i) {
-		for (size_t j = 0; j < matrix.Size(); ++j) {
+	for (size_t i = 0; i < matrix.Rows(); ++i) {
+		for (size_t j = 0; j < matrix.Columns(); ++j) {
 			os << std::setw(8) << matrix[i][j] << ' ';
 		}
 		os << '\n';
@@ -176,8 +206,8 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
 
 template <class T>
 std::istream& operator>>(std::istream& is, Matrix<T>& matrix) {
-	for (size_t i = 0; i < matrix.Size(); ++i) {
-		for (size_t j = 0; j < matrix.Size(); ++j) {
+	for (size_t i = 0; i < matrix.Rows(); ++i) {
+		for (size_t j = 0; j < matrix.Columns(); ++j) {
 			is >> matrix[i][j];
 		}
 	}
@@ -186,13 +216,13 @@ std::istream& operator>>(std::istream& is, Matrix<T>& matrix) {
 
 template <class T, class U>
 Matrix<T> operator*(const Matrix<T>& a, const Matrix<U>& b) {
-	if (a.Size() != b.Size()) {
+	if (a.Columns() != b.Rows()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
-	Matrix<T> res(a.Size());
-	for (size_t i = 0; i < a.Size(); ++i) {
-		for (size_t j = 0; j < a.Size(); ++j) {
-			for (size_t k = 0; k < a.Size(); ++k) {
+	Matrix<T> res(std::make_pair(a.Rows(), b.Columns()));
+	for (size_t i = 0; i < a.Rows(); ++i) {
+		for (size_t j = 0; j < b.Columns(); ++j) {
+			for (size_t k = 0; k < a.Columns(); ++k) {
 				res[i][j] += a[i][k] * b[k][j];
 			}
 		}
@@ -202,12 +232,12 @@ Matrix<T> operator*(const Matrix<T>& a, const Matrix<U>& b) {
 
 template <class T, class U>
 Matrix<T> operator+(const Matrix<T>& a, const Matrix<U>& b) {
-	if (a.Size() != b.Size()) {
+	if (a.Sizes() != b.Sizes()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
-	Matrix<T> res(a.Size());
-	for (size_t i = 0; i < a.Size(); ++i) {
-		for (size_t j = 0; j < a.Size(); ++j) {
+	Matrix<T> res(a.Sizes());
+	for (size_t i = 0; i < a.Rows(); ++i) {
+		for (size_t j = 0; j < a.Columns(); ++j) {
 			res[i][j] = a[i][j] + b[i][j];
 		}
 	}
@@ -216,12 +246,12 @@ Matrix<T> operator+(const Matrix<T>& a, const Matrix<U>& b) {
 
 template <class T, class U>
 Matrix<T> operator-(const Matrix<T>& a, const Matrix<U>& b) {
-	if (a.Size() != b.Size()) {
+	if (a.Sizes() != b.Sizes()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
-	Matrix<T> res(a.Size());
-	for (size_t i = 0; i < a.Size(); ++i) {
-		for (size_t j = 0; j < a.Size(); ++j) {
+	Matrix<T> res(a.Sizes());
+	for (size_t i = 0; i < a.Rows(); ++i) {
+		for (size_t j = 0; j < a.Columns(); ++j) {
 			res[i][j] = a[i][j] - b[i][j];
 		}
 	}
@@ -230,12 +260,12 @@ Matrix<T> operator-(const Matrix<T>& a, const Matrix<U>& b) {
 
 template <class T, class U>
 Vector<T> operator*(const Matrix<T>& a, const Vector<U>& b) {
-	if (a.Size() != b.Size()) {
+	if (a.Columns() != b.Size()) {
 		throw std::runtime_error("Dimension mismatch");
 	}
-	Vector<T> res(a.Size());
-	for (size_t i = 0; i < a.Size(); ++i) {
-		for (size_t j = 0; j < a.Size(); ++j) {
+	Vector<T> res(a.Rows());
+	for (size_t i = 0; i < a.Rows(); ++i) {
+		for (size_t j = 0; j < b.Size(); ++j) {
 			res[i] += a[i][j] * b[j];
 		}
 	}
@@ -244,9 +274,9 @@ Vector<T> operator*(const Matrix<T>& a, const Vector<U>& b) {
 
 template <class T, class U>
 Matrix<T> operator*(const Matrix<T>& a, const U& b) {
-	Matrix<T> res(a.Size());
-	for (size_t i = 0; i < a.Size(); ++i) {
-		for (size_t j = 0; j < a.Size(); ++j) {
+	Matrix<T> res(a.Sizes());
+	for (size_t i = 0; i < a.Rows(); ++i) {
+		for (size_t j = 0; j < a.Columns(); ++j) {
 			res[i][j] = a[i][j] * b;
 		}
 	}
