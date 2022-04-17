@@ -22,6 +22,12 @@ public:
 
 	Vector(std::initializer_list<T> list) : _data(list), _size(_data.size()) { }
 
+	Vector(const std::vector<T>& vec) : _data(vec), _size(_data.size()) { }
+
+	operator std::vector<T>() {
+		return _data;
+	}
+
 	T& operator[](size_t index) {
 		return _data[index];
 	}

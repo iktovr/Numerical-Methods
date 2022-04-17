@@ -11,7 +11,14 @@ private:
 
 public:
 	Polynomial() : _data(1, T()) { }
+
 	Polynomial(size_t degree, T value = T()) : _data(degree+1, value) { }
+
+	Polynomial(const std::vector<T>& vec) : _data(vec) {
+		if (vec.size() == 0) {
+			_data.push_back(T());
+		}
+	}
 
 	Polynomial(std::initializer_list<T> list) : _data(list) {
 		if (list.size() == 0) {
