@@ -120,3 +120,40 @@ Polynomial<T> operator*(const Polynomial<T>& a, const Polynomial<U>& b) {
 	}
 	return res;
 }
+
+template<class T, class U>
+Polynomial<T> operator+(const Polynomial<T>& a, const Polynomial<U>& b) {
+	Polynomial<T> res(std::max(a.Degree(), b.Degree()));
+	if (a.Degree() >= b.Degree()) {
+		for (size_t i = 0; i < b.Size(); ++i) {
+			res[i] = a[i] + b[i];
+		}
+		for (size_t i = b.Size(); i < a.Size(); ++i) {
+			res[i] = a[i];
+		}
+	} else {
+		for (size_t i = 0; i < a.Size(); ++i) {
+			res[i] = a[i] + b[i];
+		}
+		for (size_t i = a.Size(); i < b.Size(); ++i) {
+			res[i] = b[i];
+		}
+	}
+	return res;
+}
+
+template<class T, class U>
+Polynomial<T> operator+(const Polynomial<T>& a, const U& b) {
+	Polynomial<T> res(a);
+	res[0] += b;
+	return res;
+}
+
+template<class T, class U>
+Polynomial<T> operator*(const T& a, const Polynomial<U>& b) {
+	Polynomial<T> res(b.Degree());
+	for (size_t i = 0; i < b.Size(); ++i) {
+		res[i] = a * b[i];
+	}
+	return res;
+}
