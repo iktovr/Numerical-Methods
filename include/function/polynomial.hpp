@@ -98,7 +98,7 @@ std::ostream& operator<<(std::ostream& os, const Polynomial<T>& p) {
 		} else if (i != p.Degree()) {
 			os << "+ ";
 		}
-		os << std::abs(p[i]) << " * x^" << i << ' ';
+		os << std::abs(p[i]) << " * x**" << i << ' ';
 	}
 
 	if (p[0] < 0) {
@@ -106,7 +106,7 @@ std::ostream& operator<<(std::ostream& os, const Polynomial<T>& p) {
 	} else if (p.Degree() != 0) {
 		os << "+ ";
 	}
-	os << p[0];
+	os << std::abs(p[0]);
 	return os;
 }
 
