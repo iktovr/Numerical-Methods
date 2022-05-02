@@ -41,7 +41,7 @@ public:
 
 		matrix[n-2][0] = h[n-2];
 		matrix[n-2][1] = 2 * (h[n-2] + h[n-1]);
-		vec[n-2] = 3 * ((y[n] - y[n-1]) / h[n-1] - (y[n-1] - y[n-2]));
+		vec[n-2] = 3 * ((y[n] - y[n-1]) / h[n-1] - (y[n-1] - y[n-2]) / h[n-2]);
 
 		Vector<T> c2 = matrix.Solve(vec);
 		std::vector<T> a(n), b(n), c(n), d(n);
