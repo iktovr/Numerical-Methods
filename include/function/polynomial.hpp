@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <initializer_list>
+#include <cmath>
 
 template <class T>
 class Polynomial {
@@ -53,6 +54,14 @@ public:
 
 	void Assign(size_t degree, T value = T()) {
 		_data.assign(degree + 1, value);
+	}
+
+	T Integrate(T a, T b) {
+		T res = 0;
+		for (size_t i = 0; i < Size(); ++i) {
+			res += _data[i] / (i+1) * (std::pow(b, i+1) - std::pow(a, i+1));
+		}
+		return res;
 	}
 
 	template <class U>
