@@ -75,9 +75,9 @@ public:
 			throw std::runtime_error("Out of range");
 		}
 
-		for (size_t i = 1; i < x.size(); ++i) {
-			if (value > x[i]) {
-				return segment[i-1](value);
+		for (size_t i = 0; i < x.size()-1; ++i) {
+			if (value >= x[i] && value <= x[i+1] ) {
+				return segment[i](value);
 			}
 		}
 
