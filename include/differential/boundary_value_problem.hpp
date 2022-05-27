@@ -57,13 +57,7 @@ std::vector<std::vector<T>> FiniteDifferenceMethod(const std::function<T(T)>& p,
 	c.push_back(0);
 	d.push_back(gamma2);
 
-	TDMatrix<T> matrix(d.size());
-	for (size_t i = 0; i < d.size(); ++i) {
-		matrix[i][0] = a[i];
-		matrix[i][1] = b[i];
-		matrix[i][2] = c[i];
-	}
-
+	TDMatrix<T> matrix(a, b, c);
 	res[1] = matrix.Solve(d);
 	return res;
 }
