@@ -50,13 +50,13 @@ int main(int argc, char* argv[]) {
 		for (size_t i = 0; i < adams[0].size(); ++i) {
 			std::cout << adams[1][i] << ' ';
 		}
-		std::cout << "\nПогрешность: " << RungeRombergError(adams[1], AdamsMethod(f, g, y0, z0, start, end, 2 * h)[1], 4) << "\n\n";
+		std::cout << "\nПогрешность: " << RungeRombergError(adams[1], AdamsMethod(f, g, y0, z0, start, end, 2 * h)[1], 4) << "\n";
 
 	} else {
 		std::cout << "set size ratio -1\nset key off\n";
 		const auto [xmin, xmax] = std::minmax_element(euler[0].begin(), euler[0].end());
 		const auto [ymin, ymax] = std::minmax_element(euler[1].begin(), euler[1].end());
-		double dx = (*xmax - *xmin) * 0.5, dy = (*ymax - *ymin);
+		double dx = (*xmax - *xmin) * 0.1, dy = (*ymax - *ymin) * 0.5;
 		std::cout << "set xrange [" << (*xmin-dx) << ':' << (*xmax+dx) << "]\nset yrange [" << (*ymin-dy) << ':' << (*ymax+dy) << "]\n";
 		
 		std::cout << "$euler << EOD\n\n";

@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "set size ratio -1\nset key off\n";
 		const auto [xmin, xmax] = std::minmax_element(shooting[0].begin(), shooting[0].end());
 		const auto [ymin, ymax] = std::minmax_element(shooting[1].begin(), shooting[1].end());
-		double dx = (*xmax - *xmin) * 0.5, dy = (*ymax - *ymin);
+		double dx = (*xmax - *xmin) * 0.1, dy = (*ymax - *ymin) * 0.5;
 		std::cout << "set xrange [" << (*xmin-dx) << ':' << (*xmax+dx) << "]\nset yrange [" << (*ymin-dy) << ':' << (*ymax+dy) << "]\n";
 		
 		std::cout << "$shooting << EOD\n\n";
