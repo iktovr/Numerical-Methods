@@ -33,10 +33,10 @@ public:
 		vec[0] = 3 * ((y[2] - y[1]) / h[1] - (y[1] - y[0]) / h[0]);
 
 		for (size_t i = 2; i < n - 1; ++i) {
-			matrix.a[i-1] = h[i-2];
-			matrix.b[i-1] = 2 * (h[i-2] + h[i-1]);
-			matrix.c[i-1] = h[i-1];
-			vec[i-1] = 3 * ((y[i+1] - y[i]) / h[i-1] - (y[i] - y[i-1]) / h[i-2]);
+			matrix.a[i-1] = h[i-1];
+			matrix.b[i-1] = 2 * (h[i-1] + h[i]);
+			matrix.c[i-1] = h[i];
+			vec[i-1] = 3 * ((y[i+1] - y[i]) / h[i] - (y[i] - y[i-1]) / h[i-1]);
 		}
 
 		matrix.a[n-2] = h[n-2];
@@ -48,15 +48,14 @@ public:
 		for (size_t i = 0; i < n-1; ++i) {
 			a[i] = y[i];
 			b[i] = (y[i+1] - y[i]) / h[i] - h[i] * (c[i+1] + 2 * c[i]) / 3.;
-			d[i] = (c[i+1] - c[i]) / h[i] / 3.;
+			d[i] = (c[i+1] - c[i]) / (3 * h[i]);
 		}
 		a[n-1] = y[n-1];
-		b[n-1] = (y[n] - y[n-1]) / h[n-1] - 2. / 3. * h[n-1] * c[n-1];
+		b[n-1] = (y[n] - y[n-1]) / h[n-1] - (2. / 3.) * h[n-1] * c[n-1];
 		d[n-1] = - c[n-1] / (3 * h[n-1]);
 
 		for (size_t i = 0; i < n; ++i) {
-			Polynomial<T> xb{-x[i], 1}, xc = xb * xb, xd = xc * xb;
-			segment[i] = d[i] * xd + c[i] * xc + b[i] * xb + a[i];
+			segment[i] = Polynomial<T>({a[i], b[i], c[i], d[i]}, x[i]);
 		}
 	}
 

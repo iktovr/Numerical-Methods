@@ -4,24 +4,28 @@
 #include <iostream>
 #include <initializer_list>
 #include <cmath>
+#include <string>
 
 template <class T>
 class Polynomial {
 private:
 	std::vector<T> _data;
+	T x0;
+
+	constexpr static double EPS = 1e-9;
 
 public:
-	Polynomial() : _data(1, T()) { }
+	Polynomial(T x0 = 0) : _data(1, T()), x0(x0) { }
 
-	Polynomial(size_t degree, T value = T()) : _data(degree+1, value) { }
+	Polynomial(size_t degree, T x0 = 0) : _data(degree+1), x0(x0) { }
 
-	Polynomial(const std::vector<T>& vec) : _data(vec) {
+	Polynomial(const std::vector<T>& vec, T x0 = 0) : _data(vec), x0(x0) {
 		if (vec.size() == 0) {
 			_data.push_back(T());
 		}
 	}
 
-	Polynomial(std::initializer_list<T> list) : _data(list) {
+	Polynomial(std::initializer_list<T> list) : _data(list), x0(0) {
 		if (list.size() == 0) {
 			_data.push_back(T());
 		}
@@ -97,6 +101,9 @@ public:
 		}
 		return *this;
 	}
+
+	template <class U>
+	friend std::ostream& operator<<(std::ostream&, const Polynomial<U>&);
 };
 
 template <class T>
@@ -107,7 +114,13 @@ std::ostream& operator<<(std::ostream& os, const Polynomial<T>& p) {
 		} else if (i != p.Degree()) {
 			os << "+ ";
 		}
-		os << std::abs(p[i]) << " * x**" << i << ' ';
+		os << std::abs(p[i]) << " * ";
+		if (std::abs(p.x0) < Polynomial<T>::EPS) {
+			os << "x";
+		} else {
+			os << "(x - " << p.x0 << ")";
+		}
+		os << "**" << i << ' ';
 	}
 
 	if (p[0] < 0) {
@@ -133,20 +146,11 @@ Polynomial<T> operator*(const Polynomial<T>& a, const Polynomial<U>& b) {
 template<class T, class U>
 Polynomial<T> operator+(const Polynomial<T>& a, const Polynomial<U>& b) {
 	Polynomial<T> res(std::max(a.Degree(), b.Degree()));
-	if (a.Degree() >= b.Degree()) {
-		for (size_t i = 0; i < b.Size(); ++i) {
-			res[i] = a[i] + b[i];
-		}
-		for (size_t i = b.Size(); i < a.Size(); ++i) {
-			res[i] = a[i];
-		}
-	} else {
-		for (size_t i = 0; i < a.Size(); ++i) {
-			res[i] = a[i] + b[i];
-		}
-		for (size_t i = a.Size(); i < b.Size(); ++i) {
-			res[i] = b[i];
-		}
+	for (size_t i = 0; i < a.Size(); ++i) {
+		res[i] += a[i];
+	}
+	for (size_t i = 0; i < b.Size(); ++i) {
+		res[i] += b[i];
 	}
 	return res;
 }
