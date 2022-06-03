@@ -38,7 +38,11 @@ std::pair<T, size_t> IterationMethod(T x, const interval_t<T>& interval, const s
 }
 
 template <class T>
-std::pair<T, size_t> NewtonMethod(T x, const std::function<T(T)>& f, const std::function<T(T)>& df, double eps) {
+std::pair<T, size_t> NewtonMethod(T l, T r, const std::function<T(T)>& f, const std::function<T(T)>& df, const std::function<T(T)>& ddf, double eps) {
+	T x = l;
+	if (f(x) * ddf(x) < eps) {
+		x = r;
+	}
 	double eps_k;
 	T next_x;
 	size_t iter_count = 0;
