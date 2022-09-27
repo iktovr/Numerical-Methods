@@ -20,34 +20,34 @@ int main(int argc, char* argv[]) {
 	auto phi_start = [](double){ return 0; };
 	auto phi_end = [](double){ return 0; };
 
-	int h_count, tau_count;
-	std::cin >> t_end >> h_count >> tau_count;
+	int n;
+	double sigma;
+	std::cin >> t_end >> n >> sigma;
 
-	grid_t<double> u = ParabolicPDESolver<double>(a, b, c, f, start, end, t_end, psi, phi_start, phi_end, h_count, tau_count);
+	std::vector<double> t, x;
+	grid_t<double> u;
+	std::cout << std::setprecision(12) << std::fixed;
+	std::tie(t, x, u) = ParabolicPDESolver<double>(a, b, c, f, start, end, t_end, psi, phi_start, phi_end, n, sigma);
 
 	if (!plot) {
-		std::cout << std::setprecision(2) << std::fixed;
-		for (int k = 0; k <= tau_count; ++k) {
-			for (int i = 0; i <= h_count; ++i) {
+		for (size_t k = 0; k < t.size(); ++k) {
+			for (size_t i = 0; i < x.size(); ++i) {
 				std::cout << u[k][i] << ' ';
 			}
 			std::cout << '\n';
 		}
 	} else {
-		double h = (end - start) / h_count;
-		double tau = t_end / tau_count;
-
 		std::cout << "set size ratio -1\nset key off\nset xlabel \"t\"\nset ylabel \"x\"\nset zlabel \"u(x, t)\"\n$data << EOD\n";
-		for (int k = 0; k <= tau_count; ++k) {
-			for (int i = 0; i <= h_count; ++i) {
-				std::cout << tau * k << ' ' << start + h * i << ' ' << u[k][i] << '\n';
+		for (size_t k = 0; k < t.size(); ++k) {
+			for (size_t i = 0; i < x.size(); ++i) {
+				std::cout << t[k] << ' ' << x[i] << ' ' << u[k][i] << '\n';
 			}
 			std::cout << '\n';
 		}
 		std::cout << "EOD\nsplot ";
-		for (int k = 0; k < tau_count; ++k) {
+		for (size_t k = 0; k < t.size()-1; ++k) {
 			std::cout << "$data every :::" << k << "::" << k << " with lines, \\\n";
 		}
-		std::cout << "$data every :::" << tau_count << "::" << tau_count << " with lines";
+		std::cout << "$data every :::" << t.size()-1 << "::" << t.size()-1 << " with lines";
 	}
 }
