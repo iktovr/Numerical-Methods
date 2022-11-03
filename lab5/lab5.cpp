@@ -213,7 +213,9 @@ int main() {
 			// TODO: Заменить все на Drag*, Slider* (imgui_demo.cpp:2075)
 
 			ImGui::Text("Equation");
-			ImGui::InputDouble("a", &pde->a, 1, 1, "%.2f");
+			if (ImGui::InputDouble("a", &pde->a, 1, 1, "%.2f")) {
+				tau_count = CourantCondition(h_count, sigma, t_end, pde->end, pde->a);
+			}
 			ImGui::InputDouble("b", &pde->b, 1, 1, "%.2f");
 			ImGui::InputDouble("c", &pde->c, 1, 1, "%.2f");
 			ImGui::Text(format("f(x, t) = %s", presets[idx].f.c_str()).get());

@@ -6,8 +6,7 @@
 
 #include "../linear/tridiagonal_matrix.hpp"
 #include "../linear/vector.hpp"
-
-const double PI = 2 * std::acos(0.0);
+#include "common.hpp"
 
 namespace ParabolicPDE {
 	template <class T>
@@ -60,39 +59,15 @@ namespace ParabolicPDE {
 		}
 	};
 
-	enum class ApproxType : int {
-		Linear,
-		Quadratic,
-		Taylor
-	};
-
 	template <class T>
 	int CourantCondition(int h_count, double sigma, T t_end, T end, T a) {
 		return t_end * a * h_count * h_count / (end * end * sigma);
 	}
 
 	template <class T>
-	std::tuple<std::vector<T>, std::vector<T>>
-	GenerateGrid(const PDE<T>& pde, T t_end, int h_count, double sigma) {
-		int tau_count = CourantCondition(h_count, sigma, t_end, pde.end, pde.a);
-		std::vector<T> x(h_count + 1), t(tau_count + 1);
-		T h = (pde.end - pde.start) / h_count;
-		T tau = t_end / tau_count;
-
-		for (int i = 0; i <= h_count; ++i) {
-			x[i] = pde.start + h * i;
-		}
-		for (int k = 0; k <= tau_count; ++k) {
-			t[k] = tau * k;
-		}
-
-		return {x, t};
-	}
-
-	template <class T>
 	std::tuple<std::vector<T>, std::vector<T>, grid_t<T>>
 	ExplicitSolver(const PDE<T>& pde, T t_end, int h_count, double sigma, ApproxType type) {
-		auto [x, t] = GenerateGrid(pde, t_end, h_count, sigma);
+		auto [x, t] = GenerateGrid<T, PDE>(pde, t_end, h_count, sigma, CourantCondition<T>);
 		return {x, t, ExplicitSolver(pde, x, t, t_end, type)};
 	}
 
@@ -109,8 +84,8 @@ namespace ParabolicPDE {
 
 		for (int k = 0; k < tau_count; ++k) {
 			for (int i = 1; i < h_count; ++i) {
-				double ddu = (u[k][i-1] - 2 * u[k][i] + u[k][i+1]) / (h * h);
-				double du = (u[k][i+1] - u[k][i-1]) / (2 * h);
+				T ddu = (u[k][i-1] - 2 * u[k][i] + u[k][i+1]) / (h * h);
+				T du = (u[k][i+1] - u[k][i-1]) / (2 * h);
 				u[k+1][i] = (pde.a * ddu + pde.b * du + pde.c * u[k][i] + pde.f(x[i], t[k])) * tau + u[k][i];
 			}
 
@@ -141,7 +116,7 @@ namespace ParabolicPDE {
 	template <class T>
 	std::tuple<std::vector<T>, std::vector<T>, grid_t<T>>
 	ImplicitSolver(const PDE<T>& pde, T t_end, int h_count, double sigma, ApproxType type) {
-		auto [x, t] = GenerateGrid(pde, t_end, h_count, sigma);
+		auto [x, t] = GenerateGrid<T, PDE>(pde, t_end, h_count, sigma, CourantCondition<T>);
 		return {x, t, ImplicitSolver(pde, x, t, t_end, type)};
 	}
 
@@ -170,7 +145,7 @@ namespace ParabolicPDE {
 		Vector<T> v(h_count+1);
 		for (int k = 0; k < tau_count; ++k) {
 			for (int i = 1; i < h_count; ++i) {
-				v[i] = -u[k][i] - tau * pde.f(x[i], t[k]);
+				v[i] = -u[k][i] - tau * pde.f(x[i], t[k+1]);
 			}
 			v[0] = pde.gamma1(t[k+1]);
 			v[h_count] = pde.gamma2(t[k+1]);
@@ -216,7 +191,7 @@ namespace ParabolicPDE {
 	template <class T>
 	std::tuple<std::vector<T>, std::vector<T>, grid_t<T>>
 	CombinedSolver(const PDE<T>& pde, T t_end, int h_count, double sigma, ApproxType type, double theta) {
-		auto [x, t] = GenerateGrid(pde, t_end, h_count, sigma);
+		auto [x, t] = GenerateGrid<T, PDE>(pde, t_end, h_count, sigma, CourantCondition<T>);
 		return {x, t, CombinedSolver(pde, x, t, t_end, type, theta)};
 	}
 
@@ -245,9 +220,9 @@ namespace ParabolicPDE {
 		Vector<T> v(h_count+1);
 		for (int k = 0; k < tau_count; ++k) {
 			for (int i = 1; i < h_count; ++i) {
-				double ddu = (u[k][i-1] - 2 * u[k][i] + u[k][i+1]) / (h * h);
-				double du = (u[k][i+1] - u[k][i-1]) / (2 * h);
-				double uik = pde.a * ddu + pde.b * du + pde.c * u[k][i] + pde.f(x[i], t[k]);
+				T ddu = (u[k][i-1] - 2 * u[k][i] + u[k][i+1]) / (h * h);
+				T du = (u[k][i+1] - u[k][i-1]) / (2 * h);
+				T uik = pde.a * ddu + pde.b * du + pde.c * u[k][i] + pde.f(x[i], t[k]);
 				v[i] = -u[k][i] - tau * (theta * pde.f(x[i], t[k]) + (1 - theta) * uik);
 			}
 			v[0] = pde.gamma1(t[k+1]);

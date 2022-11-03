@@ -6,6 +6,8 @@
 
 using namespace ParabolicPDE;
 
+const double PI = 2 * std::acos(0.0);
+
 int main() {
 	PDE<double> pde{
 		1., 1., -1., [](double, double){ return 0; }

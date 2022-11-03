@@ -8,6 +8,8 @@
 using std::exp, std::sin, std::cos;
 using namespace ParabolicPDE;
 
+const double PI = 2 * std::acos(0.0);
+
 struct Preset {
 	std::string name;
 	PDE<double> pde;
